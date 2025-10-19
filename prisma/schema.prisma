@@ -1,0 +1,129 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  phone_number String @unique @db.VarChar(15)
+  email String? @unique
+  password String
+  createdAt DateTime @default(now())
+  post Post[]
+  likedPosts LikedPost[]
+  savedPosts SavedPost[]
+  visitedPosts PostViews[]
+}
+
+enum PostColor {
+  BLACK
+  WHITE
+  GREEN
+  BLUE
+  RED
+  PURPLE
+  BROWN
+  PINK
+  YELLOW
+  ORANGE
+  AQUA
+  SMOKE_WHITE
+}
+
+enum PostCategory {
+  PANTS
+  SUIT
+  SHIRT
+  TSHIRT
+  DRESS
+  SKIRT
+  JACKET
+  COAT
+  SHOES
+  HAT
+  BAG
+  ACCESSORY
+}
+
+enum PostMark {
+  NIKE
+  ADIDAS
+  PUMA
+  REEBOK
+  VANS
+  CONVERSE
+  NEW_BALANCE
+  UNDER_ARMOUR
+  LACOSTE
+  GUCCI
+  PRADA
+  CHANEL
+  LOUIS_VUITTON
+  HERMES
+  BURBERRY
+}
+
+model Post {
+  id Int @id @default(autoincrement())
+  userId Int
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title String
+  description String @db.VarChar(512)
+  price Float
+  color PostColor
+  category PostCategory
+  mark PostMark
+  main_image String
+  images PostImages[]
+  postViews PostViews[]
+  likedBy LikedPost[]
+  savedBy SavedPost[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+model LikedPost {
+  id Int @id @default(autoincrement())
+  userId Int
+  postId Int
+  like Boolean
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  @@unique([userId, postId])
+}
+
+model SavedPost {
+  id Int @id @default(autoincrement())
+  userId Int
+  postId Int
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  @@unique([userId, postId])
+}
+
+model PostViews {
+  id Int @id @default(autoincrement())
+  postId Int
+  userId Int
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([postId, userId])
+}
+
+model PostImages {
+  id Int @id @default(autoincrement())
+  postId Int
+  order Int @db.SmallInt
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  path String
+}

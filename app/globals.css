@@ -8,6 +8,10 @@
     --background: #0a0a0a;
     --foreground: #ededed;
   }
+
+  html {
+    color-scheme: dark;
+  }
 }
 
 html,
@@ -35,8 +39,27 @@ a {
   text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+.icon-btn {
+  margin-inline: 5px;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 20px;
+  transition: 200ms;
+}
+
+.icon-btn:hover {
+  transform: scale(0.9) rotate(-4deg);
+  opacity: 0.7;
+}
+
+.link {
+  display: block;
+  background-color: var(--foreground);
+  color: var(--background);
+  width: fit-content;
+  min-width: 200px;
+  text-align: center;
+  padding: 5px;
+  border-radius: 10px;
 }

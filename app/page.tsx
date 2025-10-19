@@ -1,95 +1,166 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+import { useState } from "react";
+import { ApolloProvider, useLazyQuery, useMutation, useQuery } from "@apollo/client/react";
+import { LOGIN_USER, REGISTER_USER } from "./graphql/mutations";
+import { GET_POSTS, GET_PROFILE } from "./graphql/queries";
+import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client";
+import AddPost from "./components/AddPost";
+import GetPosts from "./components/GetPosts";
+import GetPost from "./components/GetPost";
+import DeletePost from "./components/DeletePost";
+import UpdatePost from "./components/UpdatePost";
+import Link from "next/link";
+const client = new ApolloClient({
+  link: new HttpLink({ uri: "/api/graphql" }),
+  cache: new InMemoryCache(),
+});
 
 export default function Home() {
-  return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>app/page.tsx</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [userId, setUserId] = useState(0);
+  const [userCreatedAt, setUserCreatedAt] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [password, setPassword] = useState("");
+  const [RegisterUser] = useMutation(REGISTER_USER);
+  const [LoginUser] = useMutation(LOGIN_USER);
+  const {  refetch, loading, error} = useQuery(GET_PROFILE, {
+    fetchPolicy: "network-only",
+    skip: true
+  });
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
+  const handleRegisterSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!phoneNumber || !password) {
+      alert("Please fill in all fields.");
+      return;
+    }
+    try {
+      const data = await RegisterUser({
+        variables: {
+          phone_number: phoneNumber,
+          password
+        }
+      });
+      if (data.error) {
+        alert(data.error?.message);
+      }
+      alert("User registered successfully!");
+      console.log(data);
+    } catch (error) {
+      alert("An error occurred. Please try again.");
+    }
+  };
+  const handleLoginSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!phoneNumber || !password) {
+      alert("Please fill in all fileds");
+      return;
+    }
+    try {
+      const data = await LoginUser({
+        variables: {
+          phone_number: phoneNumber,
+          password
+        }
+      });
+
+      if (data.error) {
+        alert(data.error.message);
+        return;
+      }
+      alert("login with successfully");
+      console.log(data);
+    } catch(err) {
+      console.error("مشکلی پیش آمد");
+    }
+  };
+
+  const handleGetProfile = async () => {
+    const data = await refetch() as { 
+      data: { 
+        profile: {
+          id: number,
+          phone_number: string,
+          createdAt: string,
+        }
+      },
+      error: {
+        message: string,
+      }
+    };
+    
+    if (data.error) {
+      alert(data.error?.message);
+      return;
+    }
+
+    alert("*user*");
+    setUserId(data.data.profile.id);
+    setPhoneNumber(data.data.profile.phone_number);
+    setUserCreatedAt(new Date(parseInt(data.data.profile.createdAt)).toString());
+  }
+
+  return (
+    <ApolloProvider client={client}>
+      <main>
+        <h1>api test</h1>
+        <form onSubmit={handleRegisterSubmit}>
+          <h2>register test</h2>
+          <input
+            type="number"
+            placeholder="Enter the Phone Number ..."
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)} />
+          <input
+            type="password"
+            placeholder="Enter your password ..."
+            value={password}
+            onChange={(e) => setPassword(e.target.value)} />
+          <button type="submit">Submit</button>
+        </form>
+        <form onSubmit={handleLoginSubmit}>
+          <h2>login test</h2>
+          <input 
+            type="number"
+            placeholder="Enter the Phone Number ..."
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)} />
+          <input
+            type="password"
+            placeholder="Enter your password ..."
+            value={password}
+            onChange={(e) => setPassword(e.target.value)} />
+          <button type="submit">Submit</button>
+        </form>
+        <div>
+          <h2>Get Profile</h2>
+          <button onClick={handleGetProfile}>Get Profile</button>
+          <p>id: {userId}</p>
+          <p>phone_number: {phoneNumber}</p>
+          <p>createdAt: {userCreatedAt}</p>
         </div>
+        <AddPost />
+        <DeletePost />
+        <UpdatePost />
+        <GetPost />
+        <GetPosts query={GET_POSTS} outputType={"get_posts"} />
+        <div style={{ marginTop: 20 }}>
+          <h2>test get liked post api</h2>
+          <Link className="link" href="/liked_posts">پست هایی پسندیده شده</Link>
+        </div>
+
+        <div style={{ marginTop: 20 }}>
+          <h2>test get disliked post api</h2>
+          <Link className="link" href="/disliked_posts">پست هایی که نپسندیده اید</Link>
+        </div>
+
+        <div style={{ marginTop: 20 }}>
+          <h2>test get saved post</h2>
+          <Link className="link" href="/saved_posts">پست هایی که ذخیره کرده اید</Link>
+          
+        </div>
+        
+
       </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+    </ApolloProvider>
   );
 }
