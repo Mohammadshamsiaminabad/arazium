@@ -5,7 +5,7 @@ import { DELETE_POST } from "../graphql/mutations";
 
 export default function DeletePost() {
   const [postId, setPostId] = useState("");
-  const [DeletePost, { data, loading, error }] = useMutation<{ delete_post: Boolean }>(DELETE_POST);
+  const [DeletePost, { data, loading, error }] = useMutation<{ delete_post: boolean }>(DELETE_POST);
 
   const handleDelete = async () => {
     try {
@@ -14,7 +14,7 @@ export default function DeletePost() {
       }});
       alert("ok");
     } catch(err) {
-      alert("error");
+      alert(`error: ${err}`);
       console.error(error?.message)
     }
   };

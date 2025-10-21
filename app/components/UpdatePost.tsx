@@ -18,7 +18,7 @@ export default function UpdatePost() {
   const [nowImages, setNowImages] = useState<string[]>([]);
   const [newImages, setNewImages] = useState<FileList | null>(null);
   const [GetPost, { data: postData, loading: postLoading, error: postError }] = useLazyQuery<{ get_post: PostType }>(GET_POST);
-  const [UpdatePost, { data: updateData, loading: updateLoading, error: updateError }] = useMutation<{ update_post: Boolean; }>(UPDATE_POST);
+  const [UpdatePost, { data: updateData, loading: updateLoading, error: updateError }] = useMutation<{ update_post: boolean; }>(UPDATE_POST);
   
   useEffect(() => { 
     if (postData?.get_post) {
@@ -28,8 +28,9 @@ export default function UpdatePost() {
       setColor(postData.get_post.color);
       setCategory(postData.get_post.category);
       setMark(postData.get_post.mark);
-      if (postData.get_post.images)
-        setImages(postData.get_post.images?.map((img: any) => img.path));
+      if (postData.get_post.images) {
+        setImages((postData.get_post.images as { path: string }[]).map(img => img.path))
+      }
     }
   }, [postData]);
 
@@ -44,7 +45,7 @@ export default function UpdatePost() {
       body: formData
     });
     const data = await res.json();
-    return data.files.map((file: any) => file.url);
+    return data.files.map((file: { url: string }) => file.url);
   };
 
   const handleGetPost = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -53,6 +54,7 @@ export default function UpdatePost() {
       await GetPost({ variables: { id: parseInt(postId) } });
       console.log("ok");
     } catch(err) {
+      console.error(`error: ${err}`)
       alert(postError?.message);
     }
   };

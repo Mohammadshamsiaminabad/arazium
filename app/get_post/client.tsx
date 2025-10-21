@@ -22,28 +22,29 @@ import { useEffect, useState } from "react";
 
 export default function PostsClient(args: { post: PostType | null }) {
   const { post } = args;
-  if (!post) return <p>post not found</p>
-  const [like, setLike] = useState(false);
-  const [dislike, setDislike] = useState(false);
-  const [save, setSave] = useState(false);
-  const [start, setStart] = useState(false);
-  const [LikePost] = useMutation<{ like_post: Boolean }>(LIKE_POST);
-  const [UnLikePost] = useMutation<{ unlike_post: Boolean }>(UNLIKE_POST);
-  const [DislikePost] = useMutation<{ dislike_post: Boolean }>(DISLIKE_POST);
-  const [UnDislikePost] = useMutation<{ undislike_post: Boolean }>(UNDISLIKE_POST);
-  const [SavePost] = useMutation<{ save_post: Boolean }>(SAVE_POST);
-  const [UnSavePost] = useMutation<{ unsave_post: Boolean }>(UNSAVE_POST);
+  const [like, setLike] = useState<boolean>(false);
+  const [dislike, setDislike] = useState<boolean>(false);
+  const [save, setSave] = useState<boolean>(false);
+  const [start, setStart] = useState<boolean>(false);
+  const [LikePost] = useMutation<{ like_post: boolean }>(LIKE_POST);
+  const [UnLikePost] = useMutation<{ unlike_post: boolean }>(UNLIKE_POST);
+  const [DislikePost] = useMutation<{ dislike_post: boolean }>(DISLIKE_POST);
+  const [UnDislikePost] = useMutation<{ undislike_post: boolean }>(UNDISLIKE_POST);
+  const [SavePost] = useMutation<{ save_post: boolean }>(SAVE_POST);
+  const [UnSavePost] = useMutation<{ unsave_post: boolean }>(UNSAVE_POST);
 
 
   useEffect(() => {
+    if (!post) return;
     setLike(post.likedBy);
     setDislike(post.dislikedBy);
     setSave(post.savedBy);
     const timeout = setTimeout(() => setStart(true), 1000);
     return () => clearTimeout(timeout);
-  }, []);
+  }, [post]);
 
   useEffect(() => {
+    if (!post) return;
     const HandleLike = async () => {
       if (!start) return;
       if (like) {
@@ -66,9 +67,10 @@ export default function PostsClient(args: { post: PostType | null }) {
     }
 
     HandleLike();
-  }, [like]);
+  }, [like, start, post, LikePost, UnLikePost, dislike]);
 
   useEffect(() => {
+    if (!post) return;
     const HandleDisLike = async () => {
       if (!start) return;
       if (dislike) {
@@ -90,10 +92,11 @@ export default function PostsClient(args: { post: PostType | null }) {
       }
     };
     HandleDisLike();
-  }, [dislike]);
+  }, [dislike, start, post, DislikePost, UnDislikePost, like]);
 
 
   useEffect(() => {
+    if (!post) return;
     const HandleSave = async () => {
       if (!start) return;
       if (save) {
@@ -115,9 +118,11 @@ export default function PostsClient(args: { post: PostType | null }) {
       }
     };
     HandleSave();
-  }, [save]);
+  }, [save, start, post, SavePost, UnSavePost]);
 
-
+  if (!post) {
+    return <p>post not found</p>
+  }
   return (
     <div key={post.id}>
       <p>postId: {post.id}</p>
@@ -128,7 +133,7 @@ export default function PostsClient(args: { post: PostType | null }) {
       <p>category: {post.category}</p>
       <p>mark: {post.mark}</p>
       <Image width={256} height={256} alt={post.title} src={post.main_image} priority />
-      { post.images?.map((img: any, index) => {
+      {(post.images as { path: string }[]).map((img: { path: string; }, index) => {
         if (index) return <Image key={index} width={256} height={256} alt={post.title} src={img.path} />
       })}
       <button onClick={() => { setLike(prev => !prev); setDislike(false) }} className="icon-btn">

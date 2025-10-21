@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { ApolloProvider, useLazyQuery, useMutation, useQuery } from "@apollo/client/react";
+import { ApolloProvider, useMutation, useQuery } from "@apollo/client/react";
 import { LOGIN_USER, REGISTER_USER } from "./graphql/mutations";
 import { GET_POSTS, GET_PROFILE } from "./graphql/queries";
 import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client";
@@ -22,7 +22,7 @@ export default function Home() {
   const [password, setPassword] = useState("");
   const [RegisterUser] = useMutation(REGISTER_USER);
   const [LoginUser] = useMutation(LOGIN_USER);
-  const {  refetch, loading, error} = useQuery(GET_PROFILE, {
+  const { refetch } = useQuery(GET_PROFILE, {
     fetchPolicy: "network-only",
     skip: true
   });
@@ -46,6 +46,7 @@ export default function Home() {
       alert("User registered successfully!");
       console.log(data);
     } catch (error) {
+      console.error(error);
       alert("An error occurred. Please try again.");
     }
   };
@@ -70,6 +71,7 @@ export default function Home() {
       alert("login with successfully");
       console.log(data);
     } catch(err) {
+      console.error(err);
       console.error("مشکلی پیش آمد");
     }
   };

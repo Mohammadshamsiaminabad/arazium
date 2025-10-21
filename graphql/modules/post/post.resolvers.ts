@@ -1,12 +1,11 @@
 import { PostType } from "./post.type";
-import prisma from "../../prisma";
-import { MyContext } from "../../route";
-import deleteFile from "../../config/deleteFile";
+import prisma from "@/app/api/graphql/prisma";
+import { MyContext } from "@/app/api/graphql/route";
+import deleteFile from "@/app/api/graphql/config/deleteFile";
 import path from "path";
-
-export default {
+const resolver = {
   Query: {
-    get_posts: async (_: any, args: { lastPostId: number  }) => {
+    get_posts: async (_: unknown, args: { lastPostId: number  }) => {
       try {
         const posts = await prisma.post.findMany({
           take: 20,
@@ -39,10 +38,9 @@ export default {
       }
     },
 
-    get_post: async (_: any, args: { id: number }, context: MyContext) => {
+    get_post: async (_: unknown, args: { id: number }, context: MyContext) => {
       try {
         if (!context.user) throw new Error("ابتدا وارد حساب کاربری خود شوید");
-        console.log(context.user);
         await prisma.postViews.upsert({
           where: { 
             postId_userId: {
@@ -93,7 +91,6 @@ export default {
           savedBy: saved?.id ? true : false,
 
         }
-        // console.log(result);
         return result;
       } catch(err) {
         console.error(err);
@@ -101,7 +98,7 @@ export default {
       }
     },
 
-    get_liked_posts: async (_: any, args: { lastPostId: number }, context: MyContext) => {
+    get_liked_posts: async (_: unknown, args: { lastPostId: number }, context: MyContext) => {
       try {
         if (!context.user) throw new Error("ابتدا وارد حساب کاربری خود شوید");
         const likedPostIds = await prisma.likedPost.findMany({
@@ -142,7 +139,7 @@ export default {
       }
     },
 
-    get_disliked_posts: async (_: any, args: { lastPostId: number }, context: MyContext) => {
+    get_disliked_posts: async (_: unknown, args: { lastPostId: number }, context: MyContext) => {
       try {
         if (!context.user) throw new Error("ابتدا وارد حساب کاربری خود شوید");
         const dislikedPostIds = await prisma.likedPost.findMany({
@@ -183,7 +180,7 @@ export default {
       }
     },
 
-    get_saved_posts: async (_: any, args: { lastPostId: number }, context: MyContext) => {
+    get_saved_posts: async (_: unknown, args: { lastPostId: number }, context: MyContext) => {
       try {
         if (!context.user) throw new Error("ابتدا وارد حساب کاربری خود شوید");
         const savedPostIds = await prisma.savedPost.findMany({
@@ -228,7 +225,7 @@ export default {
   },
 
   Mutation: {
-    add_post: async (_: any, args: { input: any }, context: MyContext) => {
+    add_post: async (_: unknown, args: { input: PostType }, context: MyContext) => {
       const { input } = args;
       const { title, description, price, color, category, mark, images_path } = input;
       try {
@@ -244,7 +241,7 @@ export default {
             mark,
             main_image: images_path[0],
             images: {
-              create: images_path.map((img: any, index: number) => ({
+              create: images_path.map((img: string, index: number) => ({
                 path: img,
                 order: index
               })),
@@ -263,7 +260,7 @@ export default {
       }
     },
 
-    update_post: async (_: any, args: { id: number, input: PostType }) => {
+    update_post: async (_: unknown, args: { id: number, input: PostType }) => {
       const { id, input } = args;
       try {
         const existing = await prisma.postImages.findMany({
@@ -304,13 +301,13 @@ export default {
         console.error(err);
         input.images.forEach((img) => {
           const res = path.join(process.cwd(), "public", img);
-          deleteFile(img);
+          deleteFile(res);
         });
         return false;
       }
     },
 
-    delete_post: async (_: any, args: { id: number }, context: MyContext) => {
+    delete_post: async (_: unknown, args: { id: number }, context: MyContext) => {
       try {
         if (!context.user) throw new Error("ابتدا وارد حساب کاربری خود شوید");
         const images = await prisma.postImages.findMany({
@@ -330,7 +327,7 @@ export default {
       }
     },
   
-    like_post: async (_: any, args: { id: number }, context: MyContext) => {
+    like_post: async (_: unknown, args: { id: number }, context: MyContext) => {
       try {
         if (!context.user) throw new Error("ابتدا وارد حساب کاربری خود شوید");
         const likePost = await prisma.likedPost.upsert({
@@ -355,7 +352,7 @@ export default {
       }
     },
 
-    unlike_post: async (_: any, args: { id: number }, context: MyContext) => {
+    unlike_post: async (_: unknown, args: { id: number }, context: MyContext) => {
       try {
         if (!context.user) throw new Error("ابتدا وارد حساب کاربری خود شوید");
         const unlike_post = await prisma.likedPost.deleteMany({
@@ -372,7 +369,7 @@ export default {
       }
     },
 
-    dislike_post: async (_: any, args: { id: number }, context: MyContext) => {
+    dislike_post: async (_: unknown, args: { id: number }, context: MyContext) => {
       try {
         if (!context.user) throw new Error("ابتدا وارد حساب کاربری خود شوید");
         const dislike_post = await prisma.likedPost.upsert({
@@ -397,7 +394,7 @@ export default {
       }
     },
 
-    undislike_post: async (_: any, args: { id: number }, context: MyContext) => {
+    undislike_post: async (_: unknown, args: { id: number }, context: MyContext) => {
       try {
         if (!context.user) throw new Error("ابتدا وارد حساب کاربری خود شوید");
         const undislike_post = await prisma.likedPost.deleteMany({
@@ -414,7 +411,7 @@ export default {
       }
     },
 
-    save_post: async (_: any, args: { id: number }, context: MyContext) => {
+    save_post: async (_: unknown, args: { id: number }, context: MyContext) => {
       try {
         if (!context.user) throw new Error("ابتدا وارد حساب کاربری خود شوید");
         const save_post = await prisma.savedPost.create({
@@ -435,7 +432,7 @@ export default {
       }
     },
 
-    unsave_post: async (_: any, args: { id: number }, context: MyContext) => {
+    unsave_post: async (_: unknown, args: { id: number }, context: MyContext) => {
       try {
         if (!context.user) throw new Error("ابتدا وارد حساب کاربری خود شوید");
         const unsave_post = await prisma.savedPost.deleteMany({
@@ -454,7 +451,7 @@ export default {
       }
     },
 
-    visit_post: async (_: any, args: { id: number }, context: MyContext) => {
+    visit_post: async (_: unknown, args: { id: number }, context: MyContext) => {
       try {
         if (!context.user) throw new Error("ابتدا وارد حساب کاربری خود شوید");
         const visited_post = await prisma.postViews.upsert({
@@ -479,3 +476,5 @@ export default {
     },
   },
 };
+
+export default resolver;

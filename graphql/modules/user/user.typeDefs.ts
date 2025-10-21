@@ -1,6 +1,6 @@
 import { gql } from "graphql-tag";
 
-export default gql`
+const typeDefs = gql`
   type User {
     id: String!
     phone_number: String!
@@ -16,3 +16,5 @@ export default gql`
     login(phone_number: String!, password: String!): Boolean
   }
 `;
+
+export default typeDefs;

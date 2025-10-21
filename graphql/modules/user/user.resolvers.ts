@@ -1,13 +1,12 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import prisma from "../../prisma";
+import prisma from "@/app/api/graphql/prisma";
 import { cookies } from "next/headers";
-import { MyContext } from "../../route";
+import { MyContext } from "@/app/api/graphql/route";
 
-
-export default {
+const resolver =  {
   Query: {
-    profile: async (_: any, __: any, context: MyContext) => {
+    profile: async (_: unknown, __: unknown, context: MyContext) => {
       const { user } = context;
       console.log(user);
       try {
@@ -23,6 +22,7 @@ export default {
           createdAt: findUser.createdAt,
         };
       } catch(err) {
+        console.error(err);
         return {
           id: null,
           phone_number: null,
@@ -34,7 +34,7 @@ export default {
 
   Mutation: {
 
-    register: async (_: any, { phone_number, password }: { phone_number: string; password: string }) => {
+    register: async (_: unknown, { phone_number, password }: { phone_number: string; password: string }) => {
       try {
         const findUser = await prisma.user.findUnique({ where: { phone_number } });
         if (findUser)
@@ -55,11 +55,12 @@ export default {
         
         return true;
       } catch(err) {
+        console.error(err);
         return false;
       }
     },
 
-    login: async (_: any, { phone_number, password }: { phone_number: string; password: string }) => {
+    login: async (_: unknown, { phone_number, password }: { phone_number: string; password: string }) => {
       try {
         if (!phone_number) throw new Error("شماره همراه را وارد کنید");
 
@@ -95,8 +96,11 @@ export default {
 
         return true;
       } catch(err) {
+        console.error(err);
         return false;
       }
     },
   }
 }
+
+export default resolver;

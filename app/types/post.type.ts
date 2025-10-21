@@ -10,7 +10,7 @@ export interface PostType {
   category: string;
   mark: string;
   main_image: string;
-  images: string[];
+  images?: { path: string }[] | string[];
   createdAt?: string;
   updatedAt?: string;
   likedBy: boolean;

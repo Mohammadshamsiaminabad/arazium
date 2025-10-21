@@ -1,12 +1,11 @@
 import { startServerAndCreateNextHandler } from "@as-integrations/next";
 import { ApolloServer } from "@apollo/server";
-import { resolvers, typeDefs } from "../../../graphql/schema";
-import userMiddleware from "@/graphql/modules/user/user.middleware";;
+import { resolvers, typeDefs } from "./schema";
+import userMiddleware from "./modules/user/user.middleware";
 import { configDotenv } from "dotenv";
 import { NextApiRequest, NextApiResponse } from "next";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
-import { NextRequest } from "next/server";
 configDotenv();
 
 export const config = {
@@ -28,7 +27,7 @@ function createNewTokens(userId: number) {
 }
 
 const server = new ApolloServer<MyContext>({ typeDefs, resolvers });
-const handler = startServerAndCreateNextHandler(server, {
+const startServer = startServerAndCreateNextHandler(server, {
   context: async (req, res) => {
     const request = req as NextApiRequest;
     const response = res as NextApiResponse | undefined;
@@ -77,10 +76,5 @@ const handler = startServerAndCreateNextHandler(server, {
   }
 });
 
-export async function GET(req: NextRequest) {
-  return handler(req);
-}
-
-export async function POST(req: NextRequest) {
-  return handler(req);
-}
+export const GET = startServer;
+export const POST = startServer;

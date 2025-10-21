@@ -5,7 +5,6 @@ import PostsClient from "./client";
 import { cookies } from "next/headers";
 
 export const dynamic = "force-dynamic";
-
 async function getPostData(id: string): Promise<PostType | null> {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("access_token")?.value || "";

@@ -8,4 +8,5 @@ export interface PostType {
   category: PostCategory;
   mark: PostMark;
   images: string[];
+  images_path: string[];
 }

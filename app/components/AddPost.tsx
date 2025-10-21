@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useMutation } from "@apollo/client/react";
 import { ADD_POST } from "../graphql/mutations";
 
@@ -27,7 +27,7 @@ export default function AddPost() {
       body: formData
     });
     const data = await res.json();
-    return data.files.map((file: any) => file.url);
+    return data.files.map((file: { url: string }) => file.url);
   };
 
 

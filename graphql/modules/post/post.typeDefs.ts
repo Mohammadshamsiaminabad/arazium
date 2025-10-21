@@ -1,6 +1,6 @@
 import gql from "graphql-tag";
 
-export default gql`
+const typeDefs = gql`
   enum PostColor {
     BLACK
     WHITE
@@ -128,3 +128,5 @@ export default gql`
     visit_post(id: Int!): Boolean
   }
 `;
+
+export default typeDefs;

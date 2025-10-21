@@ -20,7 +20,7 @@ export default function GetPost() {
     try {
       GetPost({ variables: { id: postId } })
     } catch(err) {
-      alert("error");
+      alert(`error: ${err}`);
       console.log(error?.message);
     }
   };
@@ -48,7 +48,7 @@ export default function GetPost() {
           <p>color: {data.get_post.color}</p>
           <p>category: {data.get_post.category}</p>
           <p>mark: {data.get_post.mark}</p>
-          { data.get_post.images?.map((img, index) => (
+          { (data.get_post.images as string[]).map((img, index) => (
             <Image key={index} width={256} height={256} alt="salam" src={img} />
           ))}
         </div> :

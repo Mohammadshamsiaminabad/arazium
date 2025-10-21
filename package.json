@@ -13,7 +13,7 @@
     "@apollo/server": "^5.0.0",
     "@as-integrations/next": "^4.0.0",
     "@graphql-tools/merge": "^9.1.1",
-    "@prisma/client": "^6.16.3",
+    "@prisma/client": "^6.17.1",
     "bcryptjs": "^3.0.2",
     "cross-fetch": "^4.1.0",
     "dotenv": "^17.2.3",
