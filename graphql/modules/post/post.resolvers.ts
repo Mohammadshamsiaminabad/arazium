@@ -116,7 +116,11 @@ const resolver = {
         });
         if (!likedPostIds.length && !args.lastPostId) throw new Error("تا حالا پستی را لایک نکرده اید");
         const likedPost = await prisma.post.findMany({
+<<<<<<< HEAD
           where: { id: { in: likedPostIds.map((post : { postId: number }) => post.postId) } },
+=======
+          where: { id: { in: likedPostIds.map((post: { postId: number; }) => post.postId) } },
+>>>>>>> 4855bd5ac04b41deef1d87b5a775625e6754f56b
           select: {
             id: true,
             title: true,
@@ -157,7 +161,11 @@ const resolver = {
         });
         if (!dislikedPostIds.length && !args.lastPostId) throw new Error("تا حالا هیچ پستی را دیس‌لایک نکرده اید");
         const dislikedPost = await prisma.post.findMany({
+<<<<<<< HEAD
           where: { id: { in: dislikedPostIds.map((post : { postId: number }) => post.postId) } },
+=======
+          where: { id: { in: dislikedPostIds.map((post : { postId: number; }) => post.postId) } },
+>>>>>>> 4855bd5ac04b41deef1d87b5a775625e6754f56b
           select: {
             id: true,
             title: true,
@@ -200,7 +208,11 @@ const resolver = {
         console.log(savedPostIds);
         if (!savedPostIds.length && !args.lastPostId) throw new Error("تا حالا هیچ پستی ذخیره نکرده اید");
         const savedPost = await prisma.post.findMany({
+<<<<<<< HEAD
           where: { id: { in: savedPostIds.map((post: { postId: number }) => post.postId) } },
+=======
+          where: { id: { in: savedPostIds.map((post: { postId: number; }) => post.postId) } },
+>>>>>>> 4855bd5ac04b41deef1d87b5a775625e6754f56b
           select: {
             id: true,
             title: true,
